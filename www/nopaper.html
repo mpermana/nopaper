@@ -1,0 +1,88 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>no more paper.com</title>
+
+    <!-- third-party css -->
+    <link rel="stylesheet" href="css/third_party/multi-select.css"     />
+    <link rel="stylesheet" href="css/third_party/jquery-ui.css"        />
+    <link rel="stylesheet" href="css/third_party/jquery.tagsinput.css" />
+    <link rel="stylesheet" href="css/third_party/jquery.timepicker.css"/>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/cupertino/jquery-ui.css" />
+
+    <!-- our css -->
+    <link rel="stylesheet" href="nopaper/css/np.css"                    />
+
+    <!-- third-party js -->
+    <script src="thirdparty/js/jquery-1.9.0.js"        ></script>
+    <script src="thirdparty/js/jquery.form.js"         ></script>
+    <script src="thirdparty/js/underscore.js"          ></script>
+    <script src="thirdparty/js/backbone.js"            ></script>
+    <script src="thirdparty/js/jquery-ui.js"           ></script>
+    <script src="thirdparty/js/jquery.cookie.js"       ></script>
+    <script src="thirdparty/js/dust-full-0.3.0.js"     ></script>
+    <script src="thirdparty/js/dust-helpers-1.1.0.js"  ></script>
+    <script src="nopaper/js/np.js"></script>
+    <script src="nopaper/js/np.messages.js"></script>
+    <script src="nopaper/js/np.template.js"></script>
+    <script src="nopaper/js/np.router.js"></script>
+    <script src="nopaper/js/np.session.js"></script>
+    <script src="nopaper/js/np.views.js"></script>
+
+    <!-- FB script must be last -->
+    <script src="//connect.facebook.net/en_US/all/debug.js"></script>
+
+  </head>
+  <body>
+    <div class="header">
+      <span>NO MORE PAPER</span>
+      <span class="right">
+        <button id="fbLogin" style="display:none">FB Login</button>
+        <button id="fbLogout" style="display:none">FB Logout</button>
+      </span>
+    </div>
+
+    <div class="content">
+    </div>
+
+    <div id="fb-root">
+    </div>
+
+    <div class="template">
+      <div id="welcomeUnauthenticated">
+        <center>
+          <img src="https://a248.e.akamai.net/assets.github.com/images/modules/home/network.png?1355422571"><br>
+          Store all your personal information in the cloud.<br>
+          Never again fill forms manually.<br>
+        </center>
+      </div>
+      <div id="welcomeAuthenticated">
+          [<span class="importStatus"><a class="fbImport">Start</a></span>] Import your personal information from facebook.
+
+          <div class="importData">
+          </div>
+          
+          <p>
+          Available Forms:<br>
+          <a class="downloadForm" data-id="f1040ez.pdf">Tax Form - 1040EZ</a>
+          </p>
+          
+      </div>
+      <div id="importedData">
+        First Name {first_name}<br>
+        Last Name {last_name}<br>
+        Email {email}<br>
+
+      </div>
+      <div id="debug-config">
+        Status = OK
+      </div>
+    </div>
+
+  </body>
+</html>
+
+
