@@ -42,7 +42,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.util.JSON;
 
 public class Server {
-	private static final Logger logger = LoggerFactory.getLogger("logger");
+	public static final Logger logger = LoggerFactory.getLogger("logger");
 
 	private static DB database;
 
