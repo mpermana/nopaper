@@ -7,14 +7,10 @@
     <title>no more paper.com</title>
 
     <!-- third-party css -->
-    <link rel="stylesheet" href="css/third_party/multi-select.css"     />
-    <link rel="stylesheet" href="css/third_party/jquery-ui.css"        />
-    <link rel="stylesheet" href="css/third_party/jquery.tagsinput.css" />
-    <link rel="stylesheet" href="css/third_party/jquery.timepicker.css"/>
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/cupertino/jquery-ui.css" />
 
     <!-- our css -->
-    <link rel="stylesheet" href="nopaper/css/np.css"                    />
+    <link rel="stylesheet" href="css/np.css"                    />
 
     <!-- third-party js -->
     <script src="thirdparty/js/jquery-1.9.0.js"        ></script>
@@ -25,23 +21,32 @@
     <script src="thirdparty/js/jquery.cookie.js"       ></script>
     <script src="thirdparty/js/dust-full-0.3.0.js"     ></script>
     <script src="thirdparty/js/dust-helpers-1.1.0.js"  ></script>
-    <script src="nopaper/js/np.js"></script>
-    <script src="nopaper/js/np.messages.js"></script>
-    <script src="nopaper/js/np.template.js"></script>
-    <script src="nopaper/js/np.router.js"></script>
-    <script src="nopaper/js/np.session.js"></script>
-    <script src="nopaper/js/np.views.js"></script>
+    <script src="js/np.js"></script>
+    <script src="js/np.messages.js"></script>
+    <script src="js/np.template.js"></script>
+    <script src="js/np.router.js"></script>
+    <script src="js/np.session.js"></script>
+    <script src="js/np.views.js"></script>
+    <script src="js/np.linkedin.js"></script>
 
     <!-- FB script must be last -->
     <script src="//connect.facebook.net/en_US/all/debug.js"></script>
+    <script src="//platform.linkedin.com/in.js">
+        api_key: qciddrd6tzh6
+	authorize: true
+	scope: r_fullprofile r_emailaddress r_network
+    </script>
 
   </head>
   <body>
     <div class="header">
-      <span>NO MORE PAPER</span>
+      <span style="color:white">NO MORE PAPER</span>
       <span class="right">
         <button id="fbLogin" style="display:none">FB Login</button>
         <button id="fbLogout" style="display:none">FB Logout</button>
+	<script type="in/Login">
+	    Hello, <?js= firstName ?> <?js= lastName ?>.
+	</script>
       </span>
     </div>
 
@@ -55,16 +60,24 @@
       <div id="welcomeUnauthenticated">
         <center>
           <img src="https://a248.e.akamai.net/assets.github.com/images/modules/home/network.png?1355422571"><br>
+	<p>
           Store all your personal information in the cloud.<br>
-          Never again fill forms manually.<br>
+          Never again fill forms manually.</p>
+
+		<p>"I am so sick and tired having to fill my name again and again whenever I fill forms. TAX forms, medical forms, application forms, etc. I want to store my personal information in the cloud and authorize the cloud app to fill in any forms in my life."</p>
         </center>
       </div>
       <div id="welcomeAuthenticated">
-          [<span class="importStatus"><a class="fbImport">Start</a></span>] Import your personal information from facebook.
+          [<span class="importStatus"><a class="importFacebook">Start</a></span>] Import your personal information from facebook.
 
           <div class="importData">
           </div>
-          
+
+
+          [<span class="importStatus"><a class="importLinkedIn">Start</a></span>] Import from LinkedIn
+
+          <div class="linkedin">
+	  </div>
           <p>
           Available Forms:<br>
           <a class="downloadForm" data-id="f1040ez.pdf">Tax Form - 1040EZ</a>
@@ -79,6 +92,9 @@
       </div>
       <div id="debug-config">
         Status = OK
+      </div>
+      <div id="img-checked">
+	<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRDdSJcNSP71lf6Bk5hVNlBFOaan5GlTZUAJrSAFUQW8eP1gMj3ww" width="32" height="32">
       </div>
     </div>
 

@@ -16,3 +16,8 @@ bin
 # Maven
 target
 
+# emacs
+*~
+
+#
+nohup.out

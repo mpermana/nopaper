@@ -209,7 +209,7 @@ public class Server {
 
 					Map<String, String> fieldValues = new HashMap<String, String>();
 					fieldValues.put("topmostSubform[0].Page1[0].Entity[0].p1-t4[0]", fb.get("first_name").toString());
-					fieldValues.put("topmostSubform[0].Page1[0].Entity[0].p1-t5[0]", fb.get("first_name").toString());
+					fieldValues.put("topmostSubform[0].Page1[0].Entity[0].p1-t5[0]", fb.get("last_name").toString());
 					System.out.println(tempFile.getAbsolutePath());
 					ReadWritePDF.createFilledPDF(input, tempFile.getAbsolutePath(), fieldValues);
 

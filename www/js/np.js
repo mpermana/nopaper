@@ -69,8 +69,9 @@ $(function () {
 });
 
 window.fbAsyncInit = function () {
+    var appId = window.location.href.match('zeeses.com') ? '224086504394701' : '361690837262157';
   FB.init({
-      appId      : '361690837262157', // App ID from the App Dashboard
+      appId      : appId, // App ID from the App Dashboard
       channelUrl : '//taru.zeeses.com/map/channel.html', // Channel File for x-domain communication
       status     : true, // check the login status upon init?
       cookie     : true, // set sessions cookies to allow your server to access the session?
@@ -78,4 +79,10 @@ window.fbAsyncInit = function () {
   });
   // Additional initialization code such as adding Event Listeners goes here
   FB.getLoginStatus(np.fbClient.loginResponse);
+}
+
+function echo() {
+  _.each(arguments,function (a) {
+    console.log(a);
+  });
 }
