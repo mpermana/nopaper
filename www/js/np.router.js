@@ -40,8 +40,10 @@ np.router = (function () {
       'config'                             : 'config_page'
     },
     welcomeView          : function () {
-      if ( np.session.get('user_id') ) {
+      var user_id = np.session.get('user_id');
+      if (user_id) {
         setContent( np.views.welcomeView.$el );
+	np.views.welcomeView.render();
       }
       else {
         this.navigate( 'unauthorized', true );
@@ -154,12 +156,15 @@ np.router = (function () {
     Backbone.history.start();
 
     np.session.on('change:user_id',function() {
-      router.navigate('',true);
+      this.set({me:new np.model.me({_id:this.get('user_id')})});
+      this.get('me').fetch().done(function() {
+	router.navigate('',true);
+      });
     });
 
     router.on( 'route', function ( page ) {
       //app.analytics.trackPageView( window.location.pathname + '#' + page );
-   } );
+    } );
   }
 
   return {

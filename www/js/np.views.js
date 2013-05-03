@@ -27,12 +27,9 @@ np.views = (function() {
 	'/me',
 	function(response) {
 	  var data = {
-	    _id : response.id,
-	    fb : response
-	  }, model = new (Backbone.Model
-			  .extend({
-			    url : '/npserver/db/me'
-			  }))();
+	    fb : response,
+	    facebookUpdateTime : new Date().getTime()
+	  }, model = np.session.get('me');
 	  model.save(data).done(doneImport);
 	  function doneImport() {
 	    $(event.currentTarget).parent().html(np.template.render('img-checked'));
@@ -48,22 +45,26 @@ np.views = (function() {
 
   function initModule() {
 
-    np.views.welcomeView = new (Backbone.View
-				.extend({
-				  el : np.template.$render('welcomeAuthenticated'),
-				  events : {
-				    'click .importFacebook' : 'importFacebook',
-				    'click .importLinkedIn' : 'importLinkedIn',
-				    'click .downloadForm' : 'downloadForm'
-				  },
-				  importLinkedIn : importLinkedIn,
-				  importFacebook : importFacebook,
-				  downloadForm : function(e) {
-				    window.location = '/npserver/pdf/'
-				      + np.session.get('user_id') + '/'
-				      + $(e.currentTarget).attr('data-id');
-				  }
-				}))();
+    np.views.WelcomeView = {
+      el : np.template.$render('welcomeAuthenticated'),
+      events : {
+	'click .importFacebook' : 'importFacebook',
+	'click .importLinkedIn' : 'importLinkedIn',
+	'click .downloadForm' : 'downloadForm'
+      },
+      importLinkedIn : importLinkedIn,
+      importFacebook : importFacebook,
+      downloadForm : function(e) {
+	window.location = '/npserver/pdf/'
+	  + np.session.get('user_id') + '/'
+	  + $(e.currentTarget).attr('data-id');
+      },
+      render : function() {
+	this.$el.find('.facebookUpdateTime').html(new Date(np.session.get('me').get('facebookUpdateTime')));
+      }
+    };
+    
+    np.views.welcomeView = new (Backbone.View.extend(np.views.WelcomeView))();
 
   }
 
