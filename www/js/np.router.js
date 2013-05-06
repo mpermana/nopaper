@@ -106,12 +106,11 @@ np.router = (function () {
     setup_ajax_error();
 
     router = new Router();
-    Backbone.history.start();
 
     np.session.on('change:userId',function() {
       this.set({me:new np.model.me({_id:this.get('userId')})});
       this.get('me').fetch().done(function() {
-    	  router.navigate('',true);
+    //	  router.navigate('',true);
       });
     });
 

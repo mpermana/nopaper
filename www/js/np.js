@@ -19,6 +19,7 @@ var np = (function () {
     np.views.initModule();
     np.router.initModule($('.content'));
     scrapper.router.initModule($('.content'));
+    Backbone.history.start();
 
 
     var headerView = new (Backbone.View.extend({
