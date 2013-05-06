@@ -75,68 +75,14 @@ np.router = (function () {
   } );
 
   function setup_ajax_error () {
-    $( document ).ajaxError( function ( e, xhr, options ) {
+    $(document).ajaxError( function ( e, xhr, options ) {
       try {
-        var CONSTANTS = {
-            HTTP_CLIENT_ERROR_BAD_REQUEST  : 400,
-            HTTP_CLIENT_ERROR_UNAUTHORIZED : 401,
-            HTTP_CLIENT_ERROR_NOT_FOUND    : 404
-          }, $dialog_error = $( '<div class="np-x-error"></div>' ),
-          parsedErrorMessage = '';
-        if ( !xhr.status ) {
-          // cross origin problem
-          $( 'div.np-shell-content' ).html( xhr.statusText );
-          $dialog_error.html( xhr.statusText );
-          if ( xhr.statusText ===
-            "Error: NETWORK_ERR: XMLHttpRequest Exception 101" ) {
-            $dialog_error.append( 'You have cross origin problem, '
-              + ' check http://developer.chrome.com/extensions/xhr.html<br>' );
-          }
-          $dialog_error.dialog( {
-            width   : 600,
-            height  : 400,
-            modal   : true,
-            buttons : {Ok : function () {
-              $( this ).dialog( 'close' );
-            }}} );
-          return;
-        }
-        if ( xhr.status ===
-          CONSTANTS.HTTP_CLIENT_ERROR_UNAUTHORIZED ) {
-          // unauthorized
-          window.location = '#unauthorized';
-          return;
-        }
-
-        // do best effort attempt to parse error
-        try {
-          parsedErrorMessage =
-            _.pluck( JSON.parse( xhr.responseText ).error_list,
-              'error_msg' ).join();
-        }
-        catch ( parse_error ) {
-          // This happens when the error is not from server.
-          // For example when uploading > 20 MB file nginx returns the error
-          // as html page in the xhr.responseText.
-          parsedErrorMessage = xhr.responseText;
-        }
-        if ( xhr.status !== CONSTANTS.HTTP_CLIENT_ERROR_NOT_FOUND &&
-          xhr.status >= CONSTANTS.HTTP_CLIENT_ERROR_BAD_REQUEST ) {
-          np.model.application.error = {e : e, xhr : xhr, options : options};
-          if ( xhr.responseText && !options.suppressErrorDialog ) {
-            $dialog_error.html( parsedErrorMessage );
-            $dialog_error.dialog( {
-              width   : 600,
-              modal   : true,
-              buttons : {Ok : function () {
-                $( this ).dialog( 'close' );
-              }}} );
-          }
+        if (!options.suppressErrorDialog) {
+            window.alert(xhr.responseText);
         }
       }
-      catch ( fatalError ) {
-        np.model.application.log( fatalError.toString() );
-        window.alert( xhr.responseText );
+      catch (fatalError) {
+        console.log(fatalError.toString());
       }
     } );
   }
@@ -158,7 +104,7 @@ np.router = (function () {
     np.session.on('change:user_id',function() {
       this.set({me:new np.model.me({_id:this.get('user_id')})});
       this.get('me').fetch().done(function() {
-	router.navigate('',true);
+    	  router.navigate('',true);
       });
     });
 
@@ -173,5 +119,3 @@ np.router = (function () {
   };
 
 }());
-
-

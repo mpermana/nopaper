@@ -8,9 +8,10 @@
 
     <!-- third-party css -->
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/cupertino/jquery-ui.css" />
+    <link rel="stylesheet" href="thirdparty/css/jquery.dataTables.css"/>
 
     <!-- our css -->
-    <link rel="stylesheet" href="css/np.css"                    />
+    <link rel="stylesheet" href="css/np.css"/>
 
     <!-- third-party js -->
     <script src="thirdparty/js/jquery-1.9.0.js"        ></script>
@@ -21,6 +22,7 @@
     <script src="thirdparty/js/jquery.cookie.js"       ></script>
     <script src="thirdparty/js/dust-full-0.3.0.js"     ></script>
     <script src="thirdparty/js/dust-helpers-1.1.0.js"  ></script>
+    <script src="thirdparty/js/jquery.dataTables.js"  ></script>
     <script src="js/np.js"></script>
     <script src="js/np.messages.js"></script>
     <script src="js/np.template.js"></script>
@@ -29,6 +31,9 @@
     <script src="js/np.model.js"></script>
     <script src="js/np.views.js"></script>
     <script src="js/np.linkedin.js"></script>
+    <script src="js/scrapper.views.js"></script>
+    <script src="js/scrapper.router.js"></script>
+    <script src="js/domUtility.js"></script>
 
     <!-- FB script must be last -->
     <script src="//connect.facebook.net/en_US/all/debug.js"></script>
@@ -95,7 +100,26 @@
         Status = OK
       </div>
       <div id="img-checked">
-	<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRDdSJcNSP71lf6Bk5hVNlBFOaan5GlTZUAJrSAFUQW8eP1gMj3ww" width="32" height="32">
+		<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRDdSJcNSP71lf6Bk5hVNlBFOaan5GlTZUAJrSAFUQW8eP1gMj3ww" width="32" height="32">
+      </div>
+      
+      <!-- scrapper -->
+      <div id="UserListView">
+      	User List:
+      	<button class="addUser">+</button>
+      	<button class="scrapUser">*</button>
+
+      	<table>
+      		<thead>
+    	  		<tr>
+    	  			<th></th>
+	      			<th>user id</th>
+	      			<th>first name</th>
+	      			<th>last name</th>
+	      			<th>email</th>
+      			</tr>
+      		</thead>
+      	</table>
       </div>
     </div>
 

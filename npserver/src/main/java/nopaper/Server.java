@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bson.BSONObject;
@@ -33,18 +34,22 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
 public class Server {
 	public static final Logger logger = LoggerFactory.getLogger("logger");
 
 	private static DB database;
+	
+	private static boolean useOid = false;
 
 	static abstract class Route extends spark.Route {
 
@@ -132,7 +137,13 @@ public class Server {
 			public Object myHandle(final Request request,
 					final Response response) {
 				DBCursor cursor = collection.find();
-				writer.write(cursor.toArray().toString());
+				List<DBObject> array = cursor.toArray();
+				if (!useOid) {
+					for (DBObject o : array) {
+						replaceIdWithString(o);
+					}
+				}
+				writer.write(array.toString());
 				return writer;
 			}
 		});
@@ -148,6 +159,9 @@ public class Server {
 					DBCursor cursor = collection.find();
 					writer.write(cursor.toArray().toString());
 				} else {
+					if (!useOid) {
+						replaceIdWithString(object);
+					}
 					writer.write(object.toString());
 				}
 				return writer;
@@ -158,9 +172,15 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
-				DBObject object = (DBObject) JSON.parse(request.body());
-				collection.save(object);
-				writer.write(object.toString());
+				DBObject o = (DBObject) JSON.parse(request.body());
+				o.removeField("_id");
+				//collection.save(object);
+				if (useOid) {
+					collection.update(new BasicDBObject("_id",getId(request)), o);
+				} else {
+					collection.update(new BasicDBObject("_id",new ObjectId(request.params("id"))), o);
+				}
+				writer.write(o.toString());
 				return writer;
 			}
 		});
@@ -178,6 +198,17 @@ public class Server {
 			}
 		});
 
+		Spark.delete(new Route("/db/:collection/:id") {
+			@Override
+			public Object myHandle(final Request request,
+					final Response response) {
+				WriteResult result = collection.remove(new BasicDBObject("_id",getId(request)));
+				writer.write(result.getError());
+				return writer;
+			}
+		});
+
+		
 		Spark.get(new Route("/") {
 			@Override
 			public Object myHandle(final Request request,
@@ -226,6 +257,11 @@ public class Server {
 				}
 			}
 		});
+	}
+
+	protected static void replaceIdWithString(DBObject o) {
+		String id = o.get("_id").toString();
+		o.put("_id", id);
 	}
 
 	protected static DBObject getMe(String userId) {
