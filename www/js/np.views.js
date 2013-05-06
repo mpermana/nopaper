@@ -2,9 +2,12 @@ np.views = (function() {
   'use strict';
 
   function importLinkedIn(event) {
-    var $el = this.$el;
+    var $el = this.$el,
+    fields = ["id", "firstName", "lastName", "pictureUrl","headline","publicProfileUrl",
+	      "educations","date-of-birth","phone-numbers","main-address","positions"];
+    
       IN.API.Profile("me")
-      .fields(["id", "firstName", "lastName", "pictureUrl","headline","publicProfileUrl","educations"])
+      .fields(fields)
       .result(saveResult);
 
     function saveResult(result) {
@@ -60,7 +63,8 @@ np.views = (function() {
 	  + $(e.currentTarget).attr('data-id');
       },
       render : function() {
-	this.$el.find('.facebookUpdateTime').html(new Date(np.session.get('me').get('facebookUpdateTime')));
+	this.$el.find('.facebookUpdateTime').html(new Date(
+	  np.session.get('me').get('facebookUpdateTime')));
       }
     };
     

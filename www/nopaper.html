@@ -41,12 +41,13 @@
         api_key: qciddrd6tzh6
 	authorize: true
 	scope: r_fullprofile r_emailaddress r_network
+	onLoad: np.linkedin.onLinkedInLoad
     </script>
 
   </head>
   <body>
     <div class="header">
-      <span style="color:white">NO MORE PAPER</span>
+      <span style="color:white; font-family:Ravie; font-size: x-large">NO MORE PAPER</span>
       <span class="right">
         <button id="fbLogin" style="display:none">FB Login</button>
         <button id="fbLogout" style="display:none">FB Logout</button>
@@ -97,7 +98,10 @@
 
       </div>
       <div id="debug-config">
-        Status = OK
+        Status = OK<br>
+	user_id = {user_id}<br>
+	fb_id = {fb_id}<br>
+	li_id = {li_id}<br>
       </div>
       <div id="img-checked">
 		<img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRDdSJcNSP71lf6Bk5hVNlBFOaan5GlTZUAJrSAFUQW8eP1gMj3ww" width="32" height="32">

@@ -23,25 +23,32 @@ np.router = (function () {
   }
 
   function config_page() {
-    var
-      $html = np.template.render$('debug-config')
-      ;
-    setContent( $html );
+    var $html = np.template.render$('debug-config',np.session.toJSON());
+    setContent($html);
+  }
+
+  function createRouterFunction(view) {
+    return function () {
+      setContent(view.$el);
+      view.render();
+    }
   }
 
   Router = Backbone.Router.extend( {
     routes               : {
       ''                                   : 'welcomeView', // matches http://example.com/#anything-here
       // user
-      'user'                               : 'listUser',
+      'pdf' : 'managePdf',
       'user/:username'                     : 'viewUser',
       // unauthorized
       'unauthorized'                       : 'unauthorized',
       'config'                             : 'config_page'
     },
+    managePdf : function () {
+    },
     welcomeView          : function () {
-      var user_id = np.session.get('user_id');
-      if (user_id) {
+      var userId = np.session.get('userId');
+      if (userId) {
         setContent( np.views.welcomeView.$el );
 	np.views.welcomeView.render();
       }
@@ -50,7 +57,7 @@ np.router = (function () {
       }
     },
     unauthorized         : function () {
-      if ( np.session.get('user_id') ) {
+      if ( np.session.get('userId') ) {
         this.navigate( '', true );
       }
       else {
@@ -101,8 +108,8 @@ np.router = (function () {
     router = new Router();
     Backbone.history.start();
 
-    np.session.on('change:user_id',function() {
-      this.set({me:new np.model.me({_id:this.get('user_id')})});
+    np.session.on('change:userId',function() {
+      this.set({me:new np.model.me({_id:this.get('userId')})});
       this.get('me').fetch().done(function() {
     	  router.navigate('',true);
       });
