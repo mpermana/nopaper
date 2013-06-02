@@ -110,7 +110,7 @@ np.router = (function () {
     np.session.on('change:userId',function() {
       this.set({me:new np.model.me({_id:this.get('userId')})});
       this.get('me').fetch().done(function() {
-    //	  router.navigate('',true);
+    	  router.navigate('',true);
       });
     });
 

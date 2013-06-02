@@ -7,7 +7,7 @@ if [ "taru" = "`hostname`" ]; then
 	export NPDATA=/home/mpermana/projects/nopaper/data
 fi
 
-nohup mvn exec:java -Dexec.mainClass=nopaper.Server &
+nohup mvn compile exec:java -Dexec.mainClass=nopaper.Server &
 
 while true; do
 	curl http://localhost:4567/npserver/
