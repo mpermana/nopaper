@@ -276,15 +276,22 @@ public class Server {
 					String latitude = getValue(me,"coords.latitude").toString();
 					String longitude = getValue(me,"coords.longitude").toString();
 					String fbUserID = getValue(me,"fbLoginStatus.authResponse.userID").toString();
-					String command = "/usr/bin/curl -F \"access_token=" + accessToken + "\"";
-					command += " -F \"message=https://maps.google.com/maps?q=" + latitude + "," + longitude + "+(I%20was%20here)\"";
+					String command = "/usr/bin/curl -F access_token=" + accessToken;
+					command += " -F message=https://maps.google.com/maps?q=" + latitude + "," + longitude + "+(I%20was%20here)";
 					command += " -v https://graph.facebook.com/" + fbUserID + "/feed";
-					System.out.println(command);
 					Process proc = Runtime.getRuntime().exec(command);
+					StringBuilder sb = new StringBuilder();
+					int b;
+					while (true) {
+						b = proc.getInputStream().read();
+						if (-1 == b)
+							break;
+						sb.append((char)b);
+					}
 					proc.getInputStream().close();
 					proc.getOutputStream().close();
 
-					return null;
+					return sb.toString();
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException(e);
@@ -297,7 +304,6 @@ public class Server {
 	Object currentObject = o;
 	String[] paths = json_path.split("\\.");
 	for (String path : paths) {
-	    System.out.println("cur = " + currentObject + " path= " + path);
 	    currentObject = ((BSONObject)currentObject).get(path);
 	}
 	return currentObject;
