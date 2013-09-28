@@ -50,7 +50,7 @@ np.router = (function () {
       var userId = np.session.get('userId');
       if (userId) {
         setContent( np.views.welcomeView.$el );
-	np.views.welcomeView.render();
+      	np.views.welcomeView.render();
       }
       else {
         this.navigate( 'unauthorized', true );

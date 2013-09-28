@@ -19,5 +19,9 @@ target
 # emacs
 *~
 
-#
+# i dont want it 
+.idea
+
+# michael
 nohup.out
+data/output

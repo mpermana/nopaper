@@ -160,3 +160,8 @@
 
 }());
 
+function echo() {
+  _.each(arguments,function (a) {
+    console.log(a);
+  });
+}
