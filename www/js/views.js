@@ -59,7 +59,7 @@ np.views = (function() {
       importFacebook : importFacebook,
       downloadForm : function(e) {
 	window.location = '/npserver/pdf/'
-	  + np.session.get('user_id') + '/'
+	  + np.session.get('userId') + '/'
 	  + $(e.currentTarget).attr('data-id');
       },
       render : function() {
