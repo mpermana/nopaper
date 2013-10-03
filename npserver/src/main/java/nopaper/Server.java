@@ -51,7 +51,8 @@ public class Server {
 
 	private static DB database;
 
-	private static boolean useOid = false;
+	// ffxiv useOid = true
+	private static boolean useOid = true;
 
 	static abstract class Route extends spark.Route {
 
@@ -189,15 +190,17 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
+				
 				DBObject o = (DBObject) JSON.parse(request.body());
 				o.removeField("_id");
 				// collection.save(object);
 
-				collection.update(new BasicDBObject("_id", getId(request)),
-						new BasicDBObject("$set", o), true, false);
-				System.out.println(o.toString());
+				DBObject query = new BasicDBObject("_id", getId(request));
+				DBObject update = new BasicDBObject("$set", o);
+//				collection.update(query, update, true, false);
+				DBObject newObject = collection.findAndModify(query, null, null, false, update, true, true); 				
 
-				writer.write(o.toString());
+				writer.write(newObject.toString());
 				return writer;
 			}
 		});
