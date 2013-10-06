@@ -17,8 +17,10 @@
 
 package nopaper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -81,11 +83,25 @@ public class Server {
 				logger.info(request.toString());
 				return myHandle(request, response);
 			} catch (Exception e) {
-				writer.write("{\"error\":\"" + e.getMessage() + "\"}");
+				StringWriter writer = new StringWriter();
+
+				BasicDBObject x = new BasicDBObject(m.T.dict("error",e.toString(),"stacktrace",printStackTrace(e)));
+				writer.write(x.toString());
 				response.status(400);
 				return writer;
 			}
 
+		}
+
+		private String printStackTrace(Exception e) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PrintStream ps =new PrintStream(baos);
+			e.printStackTrace(ps);
+			return baos.toString();
+		}
+
+		public BasicDBObject queryId(Request request) {
+			return new BasicDBObject("_id", getId(request));
 		}
 
 		public Object getId(Request request) {
@@ -110,8 +126,8 @@ public class Server {
 		response.header("Access-Control-Allow-Origin", "*");
 		String snaplogicFuckedUpHeaders = ", x-date, authorization";
 		response.header("Access-Control-Allow-Headers",
-				"Origin, X-Requested-With, Content-Type, Accept"+
-		snaplogicFuckedUpHeaders);
+				"Origin, X-Requested-With, Content-Type, Accept"
+						+ snaplogicFuckedUpHeaders);
 		response.header("Access-Control-Allow-Methods", "POST, PUT");
 	}
 
@@ -190,15 +206,16 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
-				
+
 				DBObject o = (DBObject) JSON.parse(request.body());
 				o.removeField("_id");
 				// collection.save(object);
 
-				DBObject query = new BasicDBObject("_id", getId(request));
+				DBObject query = queryId(request);
 				DBObject update = new BasicDBObject("$set", o);
-//				collection.update(query, update, true, false);
-				DBObject newObject = collection.findAndModify(query, null, null, false, update, true, true); 				
+				// collection.update(query, update, true, false);
+				DBObject newObject = collection.findAndModify(query, null,
+						null, false, update, true, true);
 
 				writer.write(newObject.toString());
 				return writer;
@@ -209,11 +226,14 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
-				DBObject one = collection.findOne(getId(request));
+				DBObject one = collection.findOne(queryId(request));
 				if (one == null)
 					writer.write("null");
-				else
-					writer.write(one.toString());
+				else {
+					String string = one.toString();
+					logger.debug(string);
+					writer.write(string);
+				}
 				return writer;
 			}
 		});
@@ -222,8 +242,7 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
-				WriteResult result = collection.remove(new BasicDBObject("_id",
-						getId(request)));
+				WriteResult result = collection.remove(queryId(request));
 				writer.write(result.getError());
 				return writer;
 			}
@@ -245,9 +264,9 @@ public class Server {
 					final Response response) {
 				response.header("Content-Type", "image/png");
 
-				DBObject dbObject = findOne("convert",request.params("id"));
+				DBObject dbObject = findOne("convert", request.params("id"));
 				Object svg = dbObject.get("svg");
-				
+
 				File svgFile = Files.createTempFile("snap", ".svg");
 				File pngFile = Files.createTempFile("snap", ".png");
 
@@ -265,7 +284,8 @@ public class Server {
 					p.getErrorStream().close();
 					p.waitFor();
 
-					FileUtils.copyFile(pngFile, response.raw().getOutputStream());
+					FileUtils.copyFile(pngFile, response.raw()
+							.getOutputStream());
 
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -301,7 +321,6 @@ public class Server {
 					ReadWritePDF.createFilledPDF(input,
 							tempFile.getAbsolutePath(), fieldValues);
 
-					
 					try (FileInputStream fis = new FileInputStream(tempFile)) {
 						IOUtils.copy(fis, response.raw().getOutputStream());
 					}
@@ -381,7 +400,7 @@ public class Server {
 		return collection.findOne(userId);
 	}
 
-	protected static DBObject findOne(String collectionName,String id) {
+	protected static DBObject findOne(String collectionName, String id) {
 		DBCollection collection = database.getCollection(collectionName);
 		return collection.findOne(id);
 	}
