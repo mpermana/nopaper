@@ -126,9 +126,9 @@ public class Server {
 		response.header("Access-Control-Allow-Origin", "*");
 		String snaplogicFuckedUpHeaders = ", x-date, authorization";
 		response.header("Access-Control-Allow-Headers",
-				"Origin, X-Requested-With, Content-Type, Accept"
-						+ snaplogicFuckedUpHeaders);
-		response.header("Access-Control-Allow-Methods", "POST, PUT");
+				"Origin, X-Requested-With, Content-Type, Accept"+
+		snaplogicFuckedUpHeaders);
+		response.header("Access-Control-Allow-Methods", "POST, PUT, DELETE");
 	}
 
 	public static void main(String[] args) throws UnknownHostException {
@@ -202,6 +202,7 @@ public class Server {
 		});
 
 		// perform upsert on 1 object and set only the fields specified
+		// id : if the length is 24, it'll try to convert the id to Mongo's ObjectId
 		Spark.put(new Route("/db/:collection/:id") {
 			@Override
 			public Object myHandle(final Request request,
