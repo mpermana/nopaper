@@ -67,11 +67,8 @@ public class Server {
 			logger.info(prefix + path);
 		}
 
-		protected StringWriter writer;
-
 		@Override
 		public Object handle(Request request, Response response) {
-			writer = new StringWriter();
 			response.header("Content-Type", "application/json");
 			setCORSResponseHeader(response);
 			String collectionName = request.params(":collection");
@@ -83,14 +80,10 @@ public class Server {
 				logger.info(request.toString());
 				return myHandle(request, response);
 			} catch (Exception e) {
-				StringWriter writer = new StringWriter();
-
 				BasicDBObject x = new BasicDBObject(m.T.dict("error",e.toString(),"stacktrace",printStackTrace(e)));
-				writer.write(x.toString());
 				response.status(400);
-				return writer;
+				return x;
 			}
-
 		}
 
 		private String printStackTrace(Exception e) {
@@ -176,6 +169,7 @@ public class Server {
 						replaceIdWithString(o);
 					}
 				}
+				StringWriter writer = new StringWriter();
 				writer.write(array.toString());
 				return writer;
 			}
@@ -188,6 +182,7 @@ public class Server {
 				DBObject object = (DBObject) JSON.parse(request.body());
 
 				collection.save(object);
+				StringWriter writer = new StringWriter();
 				if (request.queryParams("fetch") != null) {
 					DBCursor cursor = collection.find();
 					writer.write(cursor.toArray().toString());
@@ -218,6 +213,7 @@ public class Server {
 				DBObject newObject = collection.findAndModify(query, null,
 						null, false, update, true, true);
 
+				StringWriter writer = new StringWriter();
 				writer.write(newObject.toString());
 				return writer;
 			}
@@ -229,13 +225,9 @@ public class Server {
 					final Response response) {
 				DBObject one = collection.findOne(queryId(request));
 				if (one == null)
-					writer.write("null");
-				else {
-					String string = one.toString();
-					logger.debug(string);
-					writer.write(string);
-				}
-				return writer;
+					return "null";
+
+				return one.toString();
 			}
 		});
 
@@ -244,8 +236,7 @@ public class Server {
 			public Object myHandle(final Request request,
 					final Response response) {
 				WriteResult result = collection.remove(queryId(request));
-				writer.write(result.getError());
-				return writer;
+				return result;
 			}
 		});
 
@@ -253,9 +244,7 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response) {
-				StringWriter writer = new StringWriter();
-				writer.write("{'status':'ok'}");
-				return writer;
+				return "{'status':'ok'}";
 			}
 		});
 
