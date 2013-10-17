@@ -58,8 +58,6 @@ public class Server {
 
 	static abstract class Route extends spark.Route {
 
-		protected DBCollection collection;
-
 		static String prefix = "/npserver";
 
 		protected Route(String path) {
@@ -71,16 +69,16 @@ public class Server {
 		public Object handle(Request request, Response response) {
 			response.header("Content-Type", "application/json");
 			setCORSResponseHeader(response);
+			DBCollection collection = null;
 			String collectionName = request.params(":collection");
 			if (null != collectionName)
 				collection = database.getCollection(collectionName);
-			else
-				collection = null;
 			try {
 				logger.info(request.toString());
-				return myHandle(request, response);
+				return myHandle(request, response, collection);
 			} catch (Exception e) {
-				BasicDBObject x = new BasicDBObject(m.T.dict("error",e.toString(),"stacktrace",printStackTrace(e)));
+				BasicDBObject x = new BasicDBObject(m.T.dict("error",
+						e.toString(), "stacktrace", printStackTrace(e)));
 				response.status(400);
 				return x;
 			}
@@ -88,7 +86,7 @@ public class Server {
 
 		private String printStackTrace(Exception e) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			PrintStream ps =new PrintStream(baos);
+			PrintStream ps = new PrintStream(baos);
 			e.printStackTrace(ps);
 			return baos.toString();
 		}
@@ -111,7 +109,8 @@ public class Server {
 			return id;
 		}
 
-		abstract public Object myHandle(Request request, Response response);
+		abstract public Object myHandle(Request request, Response response,
+				DBCollection collection);
 
 	}
 
@@ -119,8 +118,8 @@ public class Server {
 		response.header("Access-Control-Allow-Origin", "*");
 		String snaplogicFuckedUpHeaders = ", x-date, authorization";
 		response.header("Access-Control-Allow-Headers",
-				"Origin, X-Requested-With, Content-Type, Accept"+
-		snaplogicFuckedUpHeaders);
+				"Origin, X-Requested-With, Content-Type, Accept"
+						+ snaplogicFuckedUpHeaders);
 		response.header("Access-Control-Allow-Methods", "POST, PUT, DELETE");
 	}
 
@@ -139,7 +138,8 @@ public class Server {
 			}
 
 			@Override
-			public Object myHandle(Request request, Response response) {
+			public Object myHandle(Request request, Response response,
+					DBCollection collection) {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -148,7 +148,7 @@ public class Server {
 		Spark.get(new Route("/system/:command") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				String command = request.params(":command");
 				System.out.println("system command:" + command);
 				if (command.equals("shutdown")) {
@@ -161,7 +161,7 @@ public class Server {
 		Spark.get(new Route("/db/:collection") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				DBCursor cursor = collection.find();
 				List<DBObject> array = cursor.toArray();
 				if (!useOid) {
@@ -178,7 +178,7 @@ public class Server {
 		Spark.post(new Route("/db/:collection") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				DBObject object = (DBObject) JSON.parse(request.body());
 
 				collection.save(object);
@@ -197,11 +197,12 @@ public class Server {
 		});
 
 		// perform upsert on 1 object and set only the fields specified
-		// id : if the length is 24, it'll try to convert the id to Mongo's ObjectId
+		// id : if the length is 24, it'll try to convert the id to Mongo's
+		// ObjectId
 		Spark.put(new Route("/db/:collection/:id") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 
 				DBObject o = (DBObject) JSON.parse(request.body());
 				o.removeField("_id");
@@ -222,7 +223,7 @@ public class Server {
 		Spark.get(new Route("/db/:collection/:id") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				DBObject one = collection.findOne(queryId(request));
 				if (one == null)
 					return "null";
@@ -234,7 +235,7 @@ public class Server {
 		Spark.delete(new Route("/db/:collection/:id") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				WriteResult result = collection.remove(queryId(request));
 				return result;
 			}
@@ -243,7 +244,7 @@ public class Server {
 		Spark.get(new Route("/") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				return "{'status':'ok'}";
 			}
 		});
@@ -251,7 +252,7 @@ public class Server {
 		Spark.get(new Route("/convert/:id") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				response.header("Content-Type", "image/png");
 
 				DBObject dbObject = findOne("convert", request.params("id"));
@@ -286,7 +287,7 @@ public class Server {
 		Spark.get(new Route("/pdf/:user_id/:filename") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				response.header("Content-Type", "application/pdf");
 
 				try {
@@ -326,7 +327,7 @@ public class Server {
 		Spark.post(new Route("/map/fb_feed/:user_id") {
 			@Override
 			public Object myHandle(final Request request,
-					final Response response) {
+					final Response response, DBCollection collection) {
 				try {
 					String userId = request.params("user_id");
 					DBObject me = trackFindOne(userId);
