@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 		</dependency>
 
 		<dependency>
@@ -65,6 +65,12 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.20</version>
+        </dependency>
 
 	
 	</dependencies>
