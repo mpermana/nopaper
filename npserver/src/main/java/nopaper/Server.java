@@ -38,6 +38,8 @@ import com.mongodb.ServerAddress;
 import controller.PDF;
 import controller.TextHTML;
 
+import static m.T.dict;
+
 public class Server {
 	public static final Logger logger = LoggerFactory.getLogger("logger");
 
@@ -64,7 +66,7 @@ public class Server {
 				logger.info(request.toString());
 				return myHandle(request, response, collection);
 			} catch (Exception e) {
-				BasicDBObject x = new BasicDBObject(m.T.dict("error",
+				BasicDBObject x = new BasicDBObject(dict("error",
 						e.toString(), "stacktrace", printStackTrace(e)));
 				response.status(400);
 				return x;
@@ -121,6 +123,13 @@ public class Server {
 				System.out.println("system command:" + command);
 				if (command.equals("shutdown")) {
 					System.exit(0);
+				}
+				if (command.equals("ls")) {
+					String path = request.queryParams("path");
+					if (null == path) {
+						path = "/";
+					}
+					return Files.list(path);
 				}
 				return null;
 			}

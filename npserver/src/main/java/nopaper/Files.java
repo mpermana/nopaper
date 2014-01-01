@@ -16,4 +16,21 @@ public class Files {
 		}
 	}
 
+	public static String list(String path) {
+		StringBuilder builder = new StringBuilder();
+		File[] files = new File(path).listFiles();
+		builder.append("[\n");
+		String prefix = "";
+		for (File file : files) {
+			builder.append(prefix);
+			builder.append("{\n");
+			builder.append("\t\"filename\":\""+ file.getName().replaceAll("\\\\", "\\\\\\\\") +"\",\n");
+			builder.append("\t\"lastModified\":"+ file.lastModified() +"\n");
+			builder.append("}");
+			prefix = ",\n";
+		}
+		builder.append("]\n");
+		return builder.toString();
+	}
+
 }
