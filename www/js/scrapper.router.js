@@ -35,9 +35,6 @@ scrapper.router = (function () {
     setJqueryMap( $content );
     router = new (Backbone.Router.extend({
 	    routes : {
-          '' : function (page) {
-            console.log(page);
-          },
 	        'scrapper' : function() {
 	        	var view = scrapper.views.getView('UserListView');
 	        	setContent(view.$el);
