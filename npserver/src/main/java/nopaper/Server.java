@@ -37,7 +37,6 @@ import com.mongodb.ServerAddress;
 
 import controller.PDF;
 import controller.TextHTML;
-
 import static m.T.dict;
 
 public class Server {
@@ -130,6 +129,19 @@ public class Server {
 						path = "/";
 					}
 					return Files.list(path);
+				}
+				if (command.equals("sleep")) {
+					String seconds = request.queryParams("seconds");
+					if (null == seconds) {
+						seconds = "1";
+					}
+					int i = Integer.parseInt(seconds);
+					try {
+						Thread.sleep(i*1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					return System.currentTimeMillis();
 				}
 				return null;
 			}
