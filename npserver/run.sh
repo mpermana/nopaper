@@ -1,4 +1,5 @@
 #!/bin/bash
+git pull
 echo Shutting down
 curl http://localhost:4567/npserver/system/shutdown
 
