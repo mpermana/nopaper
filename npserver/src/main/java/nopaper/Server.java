@@ -96,7 +96,7 @@ public class Server {
 	public static void main(String[] args) throws UnknownHostException {
 
 		MongoClient client = new MongoClient(new ServerAddress(
-				"taru.zeeses.com", 27017));
+				"duren.dyndns.org", 27017));
 		database = client.getDB("test");
 
 		Spark.options(new Route("/*") {
