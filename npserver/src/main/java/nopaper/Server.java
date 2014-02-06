@@ -17,10 +17,14 @@
 
 package nopaper;
 
+import static m.T.dict;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +41,6 @@ import com.mongodb.ServerAddress;
 
 import controller.PDF;
 import controller.TextHTML;
-import static m.T.dict;
 
 public class Server {
 	public static final Logger logger = LoggerFactory.getLogger("logger");
@@ -159,7 +162,12 @@ public class Server {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
-				return "{'status':'ok'}";
+				try {
+					return new BasicDBObject(dict("status", "ok", "hostname",
+						InetAddress.getLocalHost().getHostName()));
+				} catch (UnknownHostException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		});
 
