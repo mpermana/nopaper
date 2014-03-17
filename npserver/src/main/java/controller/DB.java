@@ -3,9 +3,10 @@ package controller;
 import java.io.StringWriter;
 import java.util.List;
 
+import nopaper.Server.Route;
+
 import org.bson.types.ObjectId;
 
-import nopaper.Server.Route;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -18,6 +19,42 @@ import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
 public class DB {
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getParam(Request request, String queryParam,
+			T defaultValue) {
+		String param = request.queryParams(queryParam);
+		if (null == param) {
+			return (T)defaultValue;
+		}
+
+		if (defaultValue instanceof Integer) {
+			return (T) Integer.valueOf(param);
+		} else if (defaultValue instanceof DBObject) {
+			return (T) JSON.parse(param);
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T getParam(Request request, String queryParam,
+			Class<T> clazz) {
+		String param = request.queryParams(queryParam);
+		if (null == param) {
+			try {
+				return clazz.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (Integer.class.equals(clazz)) {
+			return (T) Integer.valueOf(param);
+		} else if (DBObject.class.equals(clazz)) {
+			return (T) JSON.parse(param);
+		}
+		return null;
+	}
 
 	// ffxiv useOid = true
 	boolean useOid = true;
@@ -38,8 +75,7 @@ public class DB {
 				return new ObjectId(id);
 			}
 		} else {
-			return id == null ? String.valueOf(System.currentTimeMillis())
-					: id;
+			return id == null ? String.valueOf(System.currentTimeMillis()) : id;
 		}
 
 		return id;
@@ -50,16 +86,27 @@ public class DB {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
-				DBCursor cursor = collection.find();
-				List<DBObject> array = cursor.toArray();
-				if (!useOid) {
-					for (DBObject o : array) {
-						replaceIdWithString(o);
+				//String query = request.queryParams("query");
+				DBObject filter = getParam(request, "query", DBObject.class);
+				//if (query != null) {
+				//	filter = (DBObject) JSON.parse(query);
+				//}
+				DBCursor cursor = collection.find(filter)
+						.skip(getParam(request, "skip", 0))
+						.limit(getParam(request, "limit", 0));
+				try {
+					List<DBObject> array = cursor.toArray();
+					if (!useOid) {
+						for (DBObject o : array) {
+							replaceIdWithString(o);
+						}
 					}
+					StringWriter writer = new StringWriter();
+					writer.write(array.toString());
+					return writer;
+				} finally {
+					cursor.close();
 				}
-				StringWriter writer = new StringWriter();
-				writer.write(array.toString());
-				return writer;
 			}
 		});
 

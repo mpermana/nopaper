@@ -45,7 +45,7 @@ import controller.TextHTML;
 public class Server {
 	public static final Logger logger = LoggerFactory.getLogger("logger");
 
-	private static DB database;
+	private static MongoClient client;
 
 	public static abstract class Route extends spark.Route {
 
@@ -56,20 +56,49 @@ public class Server {
 			logger.info(prefix + path);
 		}
 
+		public static String getConfigValue(Request request, String name,
+				String defaultValue) {
+			String value;
+			value = request.queryParams(name);
+			if (value != null) {
+				return value;
+			}
+			value = request.headers(name);
+			if (value != null) {
+				return value;
+			}
+			value = request.cookie(name);
+			if (value != null) {
+				return value;
+			}
+			value = System.getProperties().getProperty(name);
+			if (value != null) {
+				return value;
+			}
+			return defaultValue;
+		}
+
+		private DBCollection getCollection(Request request) {
+			DB database = client.getDB(getConfigValue(request, "database", "test"));
+			String collectionName = request.params(":collection");
+			if (null != collectionName) {
+				return database.getCollection(collectionName);
+			}
+			return null;
+		}
+
 		@Override
 		public Object handle(Request request, Response response) {
+
 			response.header("Content-Type", "application/json");
 			setCORSResponseHeader(response);
-			DBCollection collection = null;
-			String collectionName = request.params(":collection");
-			if (null != collectionName)
-				collection = database.getCollection(collectionName);
+			DBCollection collection = getCollection(request);
 			try {
 				logger.info(request.toString());
 				return myHandle(request, response, collection);
 			} catch (Exception e) {
-				BasicDBObject x = new BasicDBObject(dict("error",
-						e.toString(), "stacktrace", printStackTrace(e)));
+				BasicDBObject x = new BasicDBObject(dict("error", e.toString(),
+						"stacktrace", printStackTrace(e)));
 				response.status(400);
 				return x;
 			}
@@ -97,10 +126,7 @@ public class Server {
 	}
 
 	public static void main(String[] args) throws UnknownHostException {
-
-		MongoClient client = new MongoClient(new ServerAddress(
-				"duren.dyndns.org", 27017));
-		database = client.getDB("test");
+		client = new MongoClient("duren.dyndns.org", 27017);
 
 		Spark.options(new Route("/*") {
 			@Override
@@ -140,7 +166,7 @@ public class Server {
 					}
 					int i = Integer.parseInt(seconds);
 					try {
-						Thread.sleep(i*1000);
+						Thread.sleep(i * 1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -151,12 +177,11 @@ public class Server {
 		});
 
 		PDF pdf = new PDF();
-		pdf.setDatabase(database);
+		pdf.setDatabase(client.getDB("test"));
 		pdf.addRoutes();
 
 		controller.DB db = new controller.DB();
 		db.addRoutes();
-
 
 		Spark.get(new Route("/") {
 			@Override
@@ -164,7 +189,7 @@ public class Server {
 					final Response response, DBCollection collection) {
 				try {
 					return new BasicDBObject(dict("status", "ok", "hostname",
-						InetAddress.getLocalHost().getHostName()));
+							InetAddress.getLocalHost().getHostName()));
 				} catch (UnknownHostException e) {
 					throw new RuntimeException(e);
 				}
@@ -172,7 +197,7 @@ public class Server {
 		});
 
 		controller.Convert convert = new controller.Convert();
-		convert.setDatabase(database);
+		convert.setDatabase(client.getDB("test"));
 		convert.addRoutes();
 
 		controller.Map map = new controller.Map();
