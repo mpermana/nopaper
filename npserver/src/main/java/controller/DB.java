@@ -41,11 +41,7 @@ public class DB {
 			Class<T> clazz) {
 		String param = request.queryParams(queryParam);
 		if (null == param) {
-			try {
-				return clazz.newInstance();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			return null;
 		}
 
 		if (Integer.class.equals(clazz)) {
