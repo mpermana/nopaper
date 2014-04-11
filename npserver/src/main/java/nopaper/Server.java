@@ -126,7 +126,10 @@ public class Server {
 	}
 
 	public static void main(String[] args) throws UnknownHostException {
-		client = new MongoClient("duren.dyndns.org", 27017);
+		String databaseHostname = System.getProperty("database.hostname");
+		if (null == databaseHostname)
+			databaseHostname = "duren.dyndns.org";
+		client = new MongoClient(databaseHostname, 27017);
 
 		Spark.options(new Route("/*") {
 			@Override
