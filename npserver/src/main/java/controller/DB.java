@@ -32,6 +32,8 @@ public class DB {
 			return (T) Integer.valueOf(param);
 		} else if (defaultValue instanceof DBObject) {
 			return (T) JSON.parse(param);
+		} else if (defaultValue instanceof Boolean) {
+			return (T) Boolean.valueOf(param);
 		}
 		return null;
 	}
@@ -80,19 +82,21 @@ public class DB {
 	public void addRoutes() {
 		Spark.get(new Route("/db/:collection") {
 			@Override
+			/**
+			 * http://192.168.1.80/npserver/db/note?query={title:%22Note%208%22}
+			 */
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
-				//String query = request.queryParams("query");
 				DBObject filter = getParam(request, "query", DBObject.class);
-				//if (query != null) {
-				//	filter = (DBObject) JSON.parse(query);
-				//}
 				DBCursor cursor = collection.find(filter)
 						.skip(getParam(request, "skip", 0))
 						.limit(getParam(request, "limit", 0));
+				DBObject orderBy = getParam(request, "orderBy", DBObject.class);
+				cursor.sort(orderBy);
+				boolean oid = getParam(request, "oid", useOid);
 				try {
 					List<DBObject> array = cursor.toArray();
-					if (!useOid) {
+					if (!oid) {
 						for (DBObject o : array) {
 							replaceIdWithString(o);
 						}
