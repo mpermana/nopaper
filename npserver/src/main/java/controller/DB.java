@@ -1,7 +1,9 @@
 package controller;
 
+import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
+
+import javax.servlet.ServletOutputStream;
 
 import nopaper.Server.Route;
 
@@ -17,6 +19,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONSerializers;
 
 public class DB {
 
@@ -80,6 +83,16 @@ public class DB {
 	}
 
 	public void addRoutes() {
+		Spark.get(new Route("/db") {
+			public Object myHandle(final Request request,
+					final Response response, DBCollection collection) {
+				com.mongodb.DB database = client.getDB(getConfigValue(request,
+						"database", "test"));
+				return JSONSerializers.getStrict().serialize(
+						database.getCollectionNames());
+			}
+		});
+
 		Spark.get(new Route("/db/:collection") {
 			@Override
 			/**
@@ -91,19 +104,26 @@ public class DB {
 				DBCursor cursor = collection.find(filter)
 						.skip(getParam(request, "skip", 0))
 						.limit(getParam(request, "limit", 0));
-				DBObject orderBy = getParam(request, "orderBy", DBObject.class);
-				cursor.sort(orderBy);
+				DBObject sort = getParam(request, "sort", DBObject.class);
+				cursor.sort(sort);
 				boolean oid = getParam(request, "oid", useOid);
 				try {
-					List<DBObject> array = cursor.toArray();
-					if (!oid) {
-						for (DBObject o : array) {
-							replaceIdWithString(o);
-						}
+					ServletOutputStream os = response.raw().getOutputStream();
+					os.write('[');
+					byte[] separator = "".getBytes();
+					byte[] separatorLines = ",\n".getBytes();
+					for (DBObject dbObject : cursor) {
+						os.write(separator);
+						if (!oid) replaceIdWithString(dbObject);
+						// TODO mapper
+						// result = mapper(dbObject)
+						os.write(dbObject.toString().getBytes());
+						separator = separatorLines;
 					}
-					StringWriter writer = new StringWriter();
-					writer.write(array.toString());
-					return writer;
+					os.write(']');
+					return "";
+				} catch (IOException e) {
+					return e;
 				} finally {
 					cursor.close();
 				}

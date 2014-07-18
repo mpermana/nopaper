@@ -45,9 +45,9 @@ import controller.TextHTML;
 public class Server {
 	public static final Logger logger = LoggerFactory.getLogger("logger");
 
-	private static MongoClient client;
-
 	public static abstract class Route extends spark.Route {
+
+		public static MongoClient client;
 
 		static String prefix = "/npserver";
 
@@ -128,8 +128,8 @@ public class Server {
 	public static void main(String[] args) throws UnknownHostException {
 		String databaseHostname = System.getProperty("database.hostname");
 		if (null == databaseHostname)
-			databaseHostname = "duren.dyndns.org";
-		client = new MongoClient(databaseHostname, 27017);
+			databaseHostname = "local.origami42.com";
+		Route.client = new MongoClient(databaseHostname, 27017);
 
 		Spark.options(new Route("/*") {
 			@Override
@@ -180,7 +180,7 @@ public class Server {
 		});
 
 		PDF pdf = new PDF();
-		pdf.setDatabase(client.getDB("test"));
+		pdf.setDatabase(Route.client.getDB("test"));
 		pdf.addRoutes();
 
 		controller.DB db = new controller.DB();
@@ -200,7 +200,7 @@ public class Server {
 		});
 
 		controller.Convert convert = new controller.Convert();
-		convert.setDatabase(client.getDB("test"));
+		convert.setDatabase(Route.client.getDB("test"));
 		convert.addRoutes();
 
 		controller.Map map = new controller.Map();
