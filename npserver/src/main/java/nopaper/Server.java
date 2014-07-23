@@ -24,7 +24,6 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
 
 import controller.PDF;
 import controller.TextHTML;
@@ -129,6 +127,7 @@ public class Server {
 		String databaseHostname = System.getProperty("database.hostname");
 		if (null == databaseHostname)
 			databaseHostname = "local.origami42.com";
+		logger.info("Using {}", databaseHostname);
 		Route.client = new MongoClient(databaseHostname, 27017);
 
 		Spark.options(new Route("/*") {

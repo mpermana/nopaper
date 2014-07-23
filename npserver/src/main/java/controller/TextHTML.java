@@ -1,10 +1,8 @@
 package controller;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.GregorianCalendar;
 
 import spark.Request;
 import spark.Response;
@@ -14,9 +12,10 @@ import freemarker.template.Template;
 
 public class TextHTML {
 
-	private final Configuration configuration = new Configuration();
+	private final Configuration configuration;
 
 	public TextHTML() {
+		configuration = new Configuration();
 		configuration
 				.setClassForTemplateLoading(this.getClass(), "/freemarker");
 	}

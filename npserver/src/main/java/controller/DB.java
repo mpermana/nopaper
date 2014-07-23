@@ -196,5 +196,13 @@ public class DB {
 			}
 		});
 
+		Spark.get(new Route("/db/:collection/distinct/:key") {
+			@Override
+			public Object myHandle(final Request request,
+					final Response response, DBCollection collection) {
+				return collection.distinct(request.params("key"));
+			}
+		});
+
 	}
 }
