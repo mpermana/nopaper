@@ -97,6 +97,7 @@ public class DB {
 			@Override
 			/**
 			 * http://192.168.1.80/npserver/db/note?query={title:%22Note%208%22}
+			 * http://192.168.1.80/npserver/db/note?orderBy={_id:-1}&query={_id:{$gte:{$oid:%22534a36ace4b092ccb66a3e02%22}}}&limit=1
 			 */
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
