@@ -94,7 +94,8 @@ public class Server {
 			setCORSResponseHeader(response);
 			DBCollection collection = getCollection(request);
 			try {
-				logger.info(request.pathInfo() + "?"
+				logger.info("ip: " + request.ip() + " url: "
+						+ request.pathInfo() + "?"
 						+ request.raw().getQueryString());
 				return myHandle(request, response, collection);
 			} catch (Exception e) {
