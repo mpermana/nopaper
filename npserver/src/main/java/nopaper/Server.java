@@ -94,9 +94,12 @@ public class Server {
 			setCORSResponseHeader(response);
 			DBCollection collection = getCollection(request);
 			try {
-				logger.info("ip: " + request.ip() + " url: "
-						+ request.pathInfo() + "?"
-						+ request.raw().getQueryString());
+				String queryString = "";
+				if (null != request.raw().getQueryString())
+					queryString = "?" + request.raw().getQueryString();
+				logger.info("ip: " + request.headers("X-Forwarded-For") + "/"
+						+ request.ip() + " url: " + request.pathInfo()
+						+ queryString);
 				return myHandle(request, response, collection);
 			} catch (Exception e) {
 				BasicDBObject x = new BasicDBObject(dict("error", e.toString(),
