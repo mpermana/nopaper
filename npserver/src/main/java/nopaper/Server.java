@@ -41,7 +41,8 @@ import controller.PDF;
 import controller.TextHTML;
 
 public class Server {
-	public static final Logger logger = LoggerFactory.getLogger("logger");
+	public static final Logger logger = LoggerFactory.getLogger(Server.class
+			.getName());
 
 	public static abstract class Route extends spark.Route {
 
@@ -77,7 +78,8 @@ public class Server {
 		}
 
 		private DBCollection getCollection(Request request) {
-			DB database = client.getDB(getConfigValue(request, "database", "test"));
+			DB database = client.getDB(getConfigValue(request, "database",
+					"test"));
 			String collectionName = request.params(":collection");
 			if (null != collectionName) {
 				return database.getCollection(collectionName);
@@ -92,7 +94,8 @@ public class Server {
 			setCORSResponseHeader(response);
 			DBCollection collection = getCollection(request);
 			try {
-				logger.info(request.toString());
+				logger.info(request.pathInfo() + "?"
+						+ request.raw().getQueryString());
 				return myHandle(request, response, collection);
 			} catch (Exception e) {
 				BasicDBObject x = new BasicDBObject(dict("error", e.toString(),
