@@ -36,6 +36,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 
 import controller.PDF;
 import controller.TextHTML;
@@ -133,9 +135,10 @@ public class Server {
 	public static void main(String[] args) throws UnknownHostException {
 		String databaseHostname = System.getProperty("database.hostname");
 		if (null == databaseHostname)
-			databaseHostname = "local.origami42.com";
+			databaseHostname = "localhost";
 		logger.info("Using {}", databaseHostname);
-		Route.client = new MongoClient(databaseHostname, 27017);
+		Route.client = new MongoClient(new ServerAddress(databaseHostname),
+			new MongoClientOptions.Builder().connectionsPerHost(2).build());
 
 		Spark.options(new Route("/*") {
 			@Override
@@ -212,8 +215,6 @@ public class Server {
 		controller.Map map = new controller.Map();
 		map.addRoutes();
 
-		TextHTML textHtml = new TextHTML();
-		textHtml.addRoutes();
 	}
 
 }
