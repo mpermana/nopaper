@@ -13,7 +13,6 @@ public class Config {
 	static {
 		config.addConfiguration(new SystemConfiguration());
 		config.addConfiguration(new EnvironmentConfiguration());
-		
 		dataDir = config.getString("NPDATA");
 		if (dataDir == null) {
 			dataDir = "/Users/mpermana/projects/nopaper/data";

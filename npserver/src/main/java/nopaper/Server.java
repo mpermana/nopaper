@@ -20,11 +20,15 @@ package nopaper;
 import static m.T.dict;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +41,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 import controller.PDF;
@@ -132,14 +137,24 @@ public class Server {
 		response.header("Access-Control-Allow-Methods", "POST, PUT, DELETE");
 	}
 
-	public static void main(String[] args) throws UnknownHostException {
+	public static void main(String[] args) throws Exception {
 		String databaseHostname = System.getProperty("database.hostname");
 		if (null == databaseHostname)
 			databaseHostname = "localhost";
 		logger.info("Using {}", databaseHostname);
+		MongoCredential credential = MongoCredential.createCredential("mpermana", "admin", "mpermana".toCharArray());
+		List<MongoCredential> credentialsList = Arrays.asList();
+		String hostname = "localhost";
+		try {
+			hostname = FileUtils.readFileToString(new File("/etc/hostname"));
+		} catch (Exception e) {
+		}
+		if ("origami".equals(hostname.trim())) {
+			credentialsList = Arrays.asList(credential);
+		}
 		Route.client = new MongoClient(new ServerAddress(databaseHostname),
-			new MongoClientOptions.Builder().connectionsPerHost(2).build());
-
+				credentialsList, new MongoClientOptions.Builder()
+						.connectionsPerHost(2).build());
 		Spark.options(new Route("/*") {
 			@Override
 			public Object handle(final Request request, final Response response) {
