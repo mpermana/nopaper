@@ -102,7 +102,8 @@ public class DB {
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
 				DBObject filter = getParam(request, "query", DBObject.class);
-				DBCursor cursor = collection.find(filter)
+                                DBObject projection = getParam(request, "fields", DBObject.class);
+				DBCursor cursor = collection.find(filter, projection)
 						.skip(getParam(request, "skip", 0))
 						.limit(getParam(request, "limit", 0));
 				DBObject sort = getParam(request, "sort", DBObject.class);
@@ -180,7 +181,8 @@ public class DB {
 			@Override
 			public Object myHandle(final Request request,
 					final Response response, DBCollection collection) {
-				DBObject one = collection.findOne(queryId(request));
+                                DBObject projection = getParam(request, "fields", DBObject.class);
+				DBObject one = collection.findOne(queryId(request), projection);
 				if (one == null)
 					return "null";
 
